@@ -2,11 +2,11 @@ export type Region = 'US' | 'IN';
 
 export type Category =
   | 'All'
-  | 'Apparel'
-  | 'Android Collectibles'
-  | 'Drinkware'
-  | 'Lifestyle & Gear'
-  | 'Stationery & Pins';
+  | 'Android Collectibles & Plushies'
+  | '1998 Retro Collection'
+  | 'YouTube Kids & Apparel'
+  | 'Chrome Dino Collectibles'
+  | 'Classic Google Drinkware, Accessories & Stationery';
 
 export type PriceFilter = 'all' | 'under-25' | 'under-50' | 'under-100' | 'above-100';
 

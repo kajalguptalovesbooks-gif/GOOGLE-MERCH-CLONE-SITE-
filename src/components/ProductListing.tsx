@@ -45,11 +45,11 @@ export const ProductListing: React.FC<ProductListingProps> = ({
 
   const categories: Category[] = [
     'All',
-    'Apparel',
-    'Android Collectibles',
-    'Drinkware',
-    'Lifestyle & Gear',
-    'Stationery & Pins',
+    'Android Collectibles & Plushies',
+    '1998 Retro Collection',
+    'YouTube Kids & Apparel',
+    'Chrome Dino Collectibles',
+    'Classic Google Drinkware, Accessories & Stationery',
   ];
 
   // Category counts
@@ -131,17 +131,17 @@ export const ProductListing: React.FC<ProductListingProps> = ({
 
           <p className="text-xs sm:text-sm text-[#5F6368] mt-1 max-w-2xl leading-relaxed">
             {selectedCategory === 'All' &&
-              'Products strategically positioned based on Google Analytics 4 conversion metrics, desktop buyer preferences, and free-shipping threshold optimization.'}
-            {selectedCategory === 'Apparel' &&
-              'Top-performing organic search category generating over 40% of store revenue. Anchored by the Marine Layer 1998 Pullover and Super G Gradient Tee.'}
-            {selectedCategory === 'Android Collectibles' &&
-              'High-interest commercial audience category. Featuring the Android Classic Plushie and enamel pins to eliminate checkout friction.'}
-            {selectedCategory === 'Drinkware' &&
-              'High average order value companion products engineered with pro-grade double-walled stainless steel.'}
-            {selectedCategory === 'Lifestyle & Gear' &&
-              'Sustainable commuter gear fabricated from 100% recycled PET plastic bottles.'}
-            {selectedCategory === 'Stationery & Pins' &&
-              'Essential low-ticket threshold boosters ($5 - $16) designed to effortlessly unlock free shipping.'}
+              'Products strategically positioned based on Google Analytics 4 conversion metrics, brand collections, and free-shipping threshold optimization.'}
+            {selectedCategory === '1998 Retro Collection' &&
+              'Featuring the Google Marine Layer 1998 Pullover (Primary Apparel Anchor), retro camp mugs, vintage baseball raglans, and organic totes.'}
+            {selectedCategory === 'Android Collectibles & Plushies' &&
+              'High-interest commercial audience category. Featuring the viral Android Classic Plushie with dynamic bundle cross-sells to eliminate Step 2 drop-off.'}
+            {selectedCategory === 'YouTube Kids & Apparel' &&
+              'Official YouTube creator gear: iconic red pullovers, silver play button enamel badges, travel tumblers, and playful kids doodle tees.'}
+            {selectedCategory === 'Chrome Dino Collectibles' &&
+              'Developer & student favorite: "No Internet" 8-bit runner desk figurine, pixel tees, and relaxed cactus runner strapback caps.'}
+            {selectedCategory === 'Classic Google Drinkware, Accessories & Stationery' &&
+              'Campus essentials: Eco insulated bottles, recycled commuter backpacks, minimal stoneware mugs, and bamboo journals.'}
           </p>
         </div>
 

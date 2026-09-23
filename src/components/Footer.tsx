@@ -99,21 +99,25 @@ export const Footer: React.FC<FooterProps> = ({
 
         <div>
           <div className="font-bold text-[#202124] mb-3 uppercase tracking-wider text-[11px]">
-            Catalog Categories
+            Brand Collections
           </div>
           <ul className="space-y-2 text-[11px] text-[#5F6368]">
-            {['Apparel', 'Android Collectibles', 'Drinkware', 'Lifestyle & Gear', 'Stationery & Pins'].map(
-              (cat) => (
-                <li key={cat}>
-                  <button
-                    onClick={() => onSelectCategory(cat as Category)}
-                    className="hover:text-[#1A73E8] transition-colors cursor-pointer"
-                  >
-                    {cat}
-                  </button>
-                </li>
-              )
-            )}
+            {[
+              'Android Collectibles & Plushies',
+              '1998 Retro Collection',
+              'YouTube Kids & Apparel',
+              'Chrome Dino Collectibles',
+              'Classic Google Drinkware, Accessories & Stationery',
+            ].map((cat) => (
+              <li key={cat}>
+                <button
+                  onClick={() => onSelectCategory(cat as Category)}
+                  className="hover:text-[#1A73E8] transition-colors cursor-pointer text-left"
+                >
+                  {cat}
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   X,
   BarChart3,
@@ -17,6 +17,12 @@ import {
   ShieldCheck,
   ChevronRight,
   GraduationCap,
+  Activity,
+  Terminal,
+  Copy,
+  Check,
+  Trash2,
+  Play,
 } from 'lucide-react';
 import {
   GA4_FIVE_QUESTIONS,
@@ -25,6 +31,13 @@ import {
   CHANNEL_METRICS,
 } from '../data/ga4Data';
 import { CheckoutMode, Region } from '../types';
+import {
+  GA4EventRecord,
+  getGA4EventStream,
+  subscribeGA4Events,
+  clearGA4EventStream,
+  sendGA4Event,
+} from '../utils/analytics';
 
 interface GA4VivaInspectorProps {
   isOpen: boolean;
@@ -32,6 +45,7 @@ interface GA4VivaInspectorProps {
   checkoutMode: CheckoutMode;
   onToggleCheckoutMode: () => void;
   region: Region;
+  initialTab?: 'questions' | 'funnel' | 'channels' | 'simulator' | 'viva' | 'gtag';
 }
 
 export const GA4VivaInspector: React.FC<GA4VivaInspectorProps> = ({
@@ -40,9 +54,23 @@ export const GA4VivaInspector: React.FC<GA4VivaInspectorProps> = ({
   checkoutMode,
   onToggleCheckoutMode,
   region: _region,
+  initialTab = 'questions',
 }) => {
-  const [activeTab, setActiveTab] = useState<'questions' | 'funnel' | 'channels' | 'simulator' | 'viva'>('questions');
+  const [activeTab, setActiveTab] = useState<'questions' | 'funnel' | 'channels' | 'simulator' | 'viva' | 'gtag'>(initialTab);
   const [selectedQuestion, setSelectedQuestion] = useState<number>(1);
+  const [liveEvents, setLiveEvents] = useState<GA4EventRecord[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setLiveEvents(getGA4EventStream());
+      const unsubscribe = subscribeGA4Events((newEvent) => {
+        setLiveEvents((prev) => [newEvent, ...prev.slice(0, 49)]);
+      });
+      return unsubscribe;
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -86,6 +114,7 @@ export const GA4VivaInspector: React.FC<GA4VivaInspectorProps> = ({
         <div className="px-5 pt-3 bg-white border-b border-[#E8EAED] flex items-center space-x-2 overflow-x-auto text-xs font-semibold">
           {[
             { id: 'questions', label: '5-Question Foundation', icon: HelpCircle },
+            { id: 'gtag', label: 'gtag.js Live Stream', icon: Activity },
             { id: 'funnel', label: 'Funnel & Step 2 Drop-off', icon: AlertTriangle },
             { id: 'channels', label: 'Audience & Channels', icon: BarChart3 },
             { id: 'simulator', label: 'A/B Test Simulator', icon: Sparkles },
@@ -548,6 +577,292 @@ export const GA4VivaInspector: React.FC<GA4VivaInspectorProps> = ({
                     </p>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: GTAG.JS LIVE STREAM (PRD Section 5) */}
+          {activeTab === 'gtag' && (
+            <div className="space-y-4">
+              {/* Header explanation */}
+              <div className="p-3.5 bg-[#E8F0FE]/50 rounded-xl border border-[#D2E3FC] space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Activity className="w-4 h-4 text-[#1A73E8]" />
+                    <span className="font-bold text-xs text-[#174EA6]">
+                      Real-Time GA4 Event Stream (PRD Section 5)
+                    </span>
+                  </div>
+                  <span className="text-[10px] bg-[#1A73E8] text-white px-2 py-0.5 rounded-full font-bold">
+                    G-GMSDEMO2026
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#1967D2] leading-relaxed">
+                  Every user interaction (browsing items, adding to cart, beginning checkout, or placing orders) dispatches standard GA4 e-commerce events via <code>gtag.js</code>. Inspect the real-time event pipeline below.
+                </p>
+              </div>
+
+              {/* 5 Tracked Events Checklist & Counters */}
+              <div className="bg-[#F8F9FA] p-3.5 rounded-xl border border-[#E8EAED] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] uppercase font-bold text-[#5F6368] tracking-wider">
+                    PRD Mandatory Tracked Events
+                  </span>
+                  <span className="text-[10px] text-[#5F6368]">
+                    {liveEvents.length} events captured this session
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                  {(['page_view', 'view_item', 'add_to_cart', 'begin_checkout', 'purchase'] as const).map(
+                    (evtName) => {
+                      const count = liveEvents.filter((e) => e.eventName === evtName).length;
+                      const hasFired = count > 0;
+
+                      return (
+                        <div
+                          key={evtName}
+                          className={`p-2.5 rounded-xl border text-center transition-all ${
+                            hasFired
+                              ? 'bg-white border-[#34A853] shadow-2xs'
+                              : 'bg-white/60 border-[#DADCE0] opacity-70'
+                          }`}
+                        >
+                          <div className="flex items-center justify-center space-x-1 mb-0.5">
+                            <span
+                              className={`w-2 h-2 rounded-full ${
+                                hasFired ? 'bg-[#34A853] animate-pulse' : 'bg-[#BDC1C6]'
+                              }`}
+                            />
+                            <span className="text-[10px] font-mono font-bold text-[#202124]">
+                              {evtName}
+                            </span>
+                          </div>
+                          <span
+                            className={`text-xs font-extrabold ${
+                              hasFired ? 'text-[#188038]' : 'text-[#70757A]'
+                            }`}
+                          >
+                            {count} fired
+                          </span>
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+
+              {/* Event Stream Log Section */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-1.5 text-xs font-bold text-[#202124]">
+                    <Terminal className="w-3.5 h-3.5 text-[#1A73E8]" />
+                    <span>Live Dispatched Event History</span>
+                  </div>
+                  {liveEvents.length > 0 && (
+                    <button
+                      onClick={() => {
+                        clearGA4EventStream();
+                        setLiveEvents([]);
+                        setSelectedEventId(null);
+                      }}
+                      className="text-[11px] text-[#EA4335] hover:text-[#C5221F] flex items-center space-x-1 cursor-pointer font-semibold"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      <span>Clear Stream</span>
+                    </button>
+                  )}
+                </div>
+
+                {liveEvents.length === 0 ? (
+                  <div className="p-8 text-center bg-[#F8F9FA] rounded-2xl border border-dashed border-[#DADCE0] space-y-2">
+                    <Activity className="w-8 h-8 text-[#BDC1C6] mx-auto animate-pulse" />
+                    <p className="text-xs font-bold text-[#5F6368]">No events recorded yet</p>
+                    <p className="text-[11px] text-[#70757A] max-w-sm mx-auto">
+                      Interact with the store (view items, add to cart, trigger checkout) or test one of the actions below to see events appear in real-time.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+                    {liveEvents.map((evt) => {
+                      const isExpanded = selectedEventId === evt.id;
+                      const hasItems = evt.params.items && Array.isArray(evt.params.items);
+
+                      return (
+                        <div
+                          key={evt.id}
+                          className="bg-white rounded-xl border border-[#DADCE0] overflow-hidden text-xs transition-all hover:border-[#1A73E8]"
+                        >
+                          <div
+                            onClick={() => setSelectedEventId(isExpanded ? null : evt.id)}
+                            className="p-3 flex items-center justify-between cursor-pointer bg-[#FAFAFA] hover:bg-[#F1F3F4]"
+                          >
+                            <div className="flex items-center space-x-2.5">
+                              <span className="font-mono text-[10px] text-[#70757A] bg-white px-1.5 py-0.5 rounded border border-[#E8EAED]">
+                                {evt.timestamp}
+                              </span>
+                              <span
+                                className={`font-mono font-bold px-2 py-0.5 rounded-full text-[11px] ${
+                                  evt.eventName === 'purchase'
+                                    ? 'bg-[#E6F4EA] text-[#137333]'
+                                    : evt.eventName === 'begin_checkout'
+                                    ? 'bg-[#FEF7E0] text-[#B06000]'
+                                    : evt.eventName === 'add_to_cart'
+                                    ? 'bg-[#E8F0FE] text-[#1A73E8]'
+                                    : 'bg-[#F1F3F4] text-[#3C4043]'
+                                }`}
+                              >
+                                {evt.eventName}
+                              </span>
+                              {evt.params.value !== undefined && (
+                                <span className="font-bold text-[#202124]">
+                                  {evt.params.currency === 'INR' ? '₹' : '$'}
+                                  {typeof evt.params.value === 'number'
+                                    ? evt.params.value.toLocaleString()
+                                    : evt.params.value}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center space-x-2 text-[11px] text-[#5F6368]">
+                              {hasItems && (
+                                <span className="text-[10px] text-[#5F6368]">
+                                  {evt.params.items.length} item{evt.params.items.length > 1 ? 's' : ''}
+                                </span>
+                              )}
+                              <ChevronRight
+                                className={`w-3.5 h-3.5 transition-transform ${
+                                  isExpanded ? 'rotate-90' : ''
+                                }`}
+                              />
+                            </div>
+                          </div>
+
+                          {isExpanded && (
+                            <div className="p-3 bg-[#202124] text-[#E8EAED] border-t border-[#3C4043] space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-[#9AA0A6] uppercase tracking-wider font-mono">
+                                  gtag Payload
+                                </span>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    navigator.clipboard.writeText(evt.formattedCode);
+                                    setCopiedId(evt.id);
+                                    setTimeout(() => setCopiedId(null), 2000);
+                                  }}
+                                  className="text-[10px] text-[#8AB4F8] hover:text-[#D2E3FC] flex items-center space-x-1 cursor-pointer font-mono"
+                                >
+                                  {copiedId === evt.id ? (
+                                    <>
+                                      <Check className="w-3 h-3 text-[#81C995]" />
+                                      <span className="text-[#81C995]">Copied</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy className="w-3 h-3" />
+                                      <span>Copy gtag Code</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                              <pre className="text-[11px] font-mono leading-relaxed overflow-x-auto p-2 bg-black/40 rounded-lg text-[#81C995]">
+                                {evt.formattedCode}
+                              </pre>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Interactive Quick Dispatch Tester */}
+              <div className="p-3 bg-[#F8F9FA] rounded-xl border border-[#DADCE0] space-y-2">
+                <span className="text-[10px] uppercase font-bold text-[#5F6368] tracking-wider block">
+                  Quick Event Simulator (Viva Demonstration Tool)
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    onClick={() =>
+                      sendGA4Event('page_view', {
+                        page_title: 'Google Merchandise Store — Demo Test',
+                        page_location: window.location.href,
+                        send_to: 'G-GMSDEMO2026',
+                      })
+                    }
+                    className="px-2.5 py-1 bg-white hover:bg-[#F1F3F4] text-[#3C4043] border border-[#DADCE0] rounded-lg text-[11px] font-mono font-semibold cursor-pointer"
+                  >
+                    + test page_view
+                  </button>
+                  <button
+                    onClick={() =>
+                      sendGA4Event('view_item', {
+                        currency: 'USD',
+                        value: 78.0,
+                        items: [
+                          {
+                            item_id: 'google-marine-layer-1998-pullover',
+                            item_name: 'Google Marine Layer 1998 Pullover',
+                            item_category: '1998 Retro Collection',
+                            price: 78.0,
+                          },
+                        ],
+                      })
+                    }
+                    className="px-2.5 py-1 bg-white hover:bg-[#F1F3F4] text-[#3C4043] border border-[#DADCE0] rounded-lg text-[11px] font-mono font-semibold cursor-pointer"
+                  >
+                    + test view_item (Pullover)
+                  </button>
+                  <button
+                    onClick={() =>
+                      sendGA4Event('add_to_cart', {
+                        currency: 'USD',
+                        value: 28.0,
+                        items: [
+                          {
+                            item_id: 'android-classic-plushie',
+                            item_name: 'Android Classic Plushie',
+                            item_category: 'Android Collectibles & Plushies',
+                            price: 28.0,
+                            quantity: 1,
+                          },
+                        ],
+                      })
+                    }
+                    className="px-2.5 py-1 bg-white hover:bg-[#F1F3F4] text-[#3C4043] border border-[#DADCE0] rounded-lg text-[11px] font-mono font-semibold cursor-pointer"
+                  >
+                    + test add_to_cart (Plushie)
+                  </button>
+                  <button
+                    onClick={() =>
+                      sendGA4Event('begin_checkout', {
+                        currency: 'USD',
+                        value: 50.0,
+                        shipping: 0,
+                        items_count: 2,
+                      })
+                    }
+                    className="px-2.5 py-1 bg-white hover:bg-[#F1F3F4] text-[#3C4043] border border-[#DADCE0] rounded-lg text-[11px] font-mono font-semibold cursor-pointer"
+                  >
+                    + test begin_checkout
+                  </button>
+                  <button
+                    onClick={() =>
+                      sendGA4Event('purchase', {
+                        transaction_id: `GMS-${Date.now()}`,
+                        value: 78.0,
+                        currency: 'USD',
+                        shipping: 0,
+                        payment_type: 'google_pay',
+                      })
+                    }
+                    className="px-2.5 py-1 bg-white hover:bg-[#F1F3F4] text-[#137333] border border-[#34A853] rounded-lg text-[11px] font-mono font-bold cursor-pointer"
+                  >
+                    + test purchase
+                  </button>
+                </div>
               </div>
             </div>
           )}

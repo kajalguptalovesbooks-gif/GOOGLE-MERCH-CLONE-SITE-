@@ -46,11 +46,11 @@ export const Header: React.FC<HeaderProps> = ({
 
   const categories: Category[] = [
     'All',
-    'Apparel',
-    'Android Collectibles',
-    'Drinkware',
-    'Lifestyle & Gear',
-    'Stationery & Pins',
+    'Android Collectibles & Plushies',
+    '1998 Retro Collection',
+    'YouTube Kids & Apparel',
+    'Chrome Dino Collectibles',
+    'Classic Google Drinkware, Accessories & Stationery',
   ];
 
   const handleCategoryClick = (cat: Category) => {
@@ -234,8 +234,10 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center space-x-1 py-1.5 overflow-x-auto text-xs font-semibold text-[#3C4043]">
             {categories.map((cat) => {
               const isSelected = selectedCategory === cat;
-              const isTopOrganic = cat === 'Apparel';
-              const isHighIntent = cat === 'Android Collectibles';
+              const isRetroAnchor = cat === '1998 Retro Collection';
+              const isAndroidFocus = cat === 'Android Collectibles & Plushies';
+              const isChromeDino = cat === 'Chrome Dino Collectibles';
+              const isYouTube = cat === 'YouTube Kids & Apparel';
 
               return (
                 <button
@@ -248,14 +250,24 @@ export const Header: React.FC<HeaderProps> = ({
                   }`}
                 >
                   <span>{cat}</span>
-                  {isTopOrganic && !isSelected && (
+                  {isRetroAnchor && !isSelected && (
                     <span className="text-[10px] bg-[#E8F0FE] text-[#1A73E8] px-1.5 py-0.2 rounded-md font-bold">
-                      Organic Anchor
+                      Pullover Anchor
                     </span>
                   )}
-                  {isHighIntent && !isSelected && (
+                  {isAndroidFocus && !isSelected && (
                     <span className="text-[10px] bg-[#E6F4EA] text-[#137333] px-1.5 py-0.2 rounded-md font-bold">
-                      Q1 Focus
+                      Trending
+                    </span>
+                  )}
+                  {isChromeDino && !isSelected && (
+                    <span className="text-[10px] bg-[#FEF7E0] text-[#B06000] px-1.5 py-0.2 rounded-md font-bold">
+                      Viral
+                    </span>
+                  )}
+                  {isYouTube && !isSelected && (
+                    <span className="text-[10px] bg-[#FCE8E6] text-[#EA4335] px-1.5 py-0.2 rounded-md font-bold">
+                      Creator
                     </span>
                   )}
                 </button>

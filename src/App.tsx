@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { PRODUCTS, BUNDLE_ITEMS } from './data/products';
+import { PRODUCTS } from './data/products';
 import {
   Product,
   Category,
@@ -18,6 +18,16 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { OrderConfirmationModal } from './components/OrderConfirmationModal';
 import { GA4VivaInspector } from './components/GA4VivaInspector';
 import { Footer } from './components/Footer';
+import {
+  trackPageView,
+  trackViewItem,
+  trackAddToCart,
+  trackBeginCheckout,
+  trackPurchase,
+  subscribeGA4Events,
+  GA4EventRecord,
+} from './utils/analytics';
+import { Activity } from 'lucide-react';
 
 export default function App() {
   // Region & Mode States
@@ -46,6 +56,27 @@ export default function App() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState<boolean>(false);
   const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrder | null>(null);
   const [isGA4DeckOpen, setIsGA4DeckOpen] = useState<boolean>(false);
+  const [inspectorTab, setInspectorTab] = useState<'questions' | 'funnel' | 'channels' | 'simulator' | 'viva' | 'gtag'>('questions');
+
+  // GA4 Live event pill indicator
+  const [latestEvent, setLatestEvent] = useState<GA4EventRecord | null>(null);
+
+  // Subscribe to live events for real-time indicator
+  useEffect(() => {
+    return subscribeGA4Events((evt) => {
+      setLatestEvent(evt);
+    });
+  }, []);
+
+  // GA4: page_view on load and category switch
+  useEffect(() => {
+    trackPageView(
+      selectedCategory === 'All'
+        ? 'Google Merchandise Store — Official Store'
+        : `Google Merchandise Store — ${selectedCategory}`,
+      window.location.href
+    );
+  }, [selectedCategory]);
 
   // Trigger brief cart pulse animation
   const triggerCartPulse = useCallback(() => {
@@ -53,7 +84,15 @@ export default function App() {
     setTimeout(() => setCartPulse(false), 600);
   }, []);
 
-  // Add product to cart
+  // GA4: view_item when opening product details
+  const handleSelectProduct = (product: Product | null) => {
+    setSelectedProduct(product);
+    if (product) {
+      trackViewItem(product, region === 'IN' ? 'INR' : 'USD');
+    }
+  };
+
+  // Add product to cart + GA4 add_to_cart
   const handleAddToCart = (
     product: Product,
     quantity: number = 1,
@@ -92,6 +131,9 @@ export default function App() {
     setJustAddedId(product.id);
     setTimeout(() => setJustAddedId(null), 1800);
     triggerCartPulse();
+
+    // Fire GA4 add_to_cart
+    trackAddToCart(product, quantity, region === 'IN' ? 'INR' : 'USD', size, color);
   };
 
   // Quick Add handler from card
@@ -102,11 +144,10 @@ export default function App() {
 
   // 1-Click Bundle Add
   const handleAddBundleItem = (bundleItem: BundleItem) => {
-    // Find or convert bundle item to product
     const mockProduct: Product = {
       id: bundleItem.id,
       name: bundleItem.name,
-      category: 'Stationery & Pins',
+      category: (bundleItem.category as Category) || 'Android Collectibles & Plushies',
       priceUSD: bundleItem.priceUSD,
       priceINR: bundleItem.priceINR,
       image: bundleItem.image,
@@ -137,20 +178,34 @@ export default function App() {
     setCart((prev) => prev.filter((item) => item.id !== cartItemId));
   };
 
-  // Proceed to Checkout
+  // Proceed to Checkout + GA4 begin_checkout
   const handleProceedToCheckout = () => {
+    const subtotalUSD = cart.reduce((s, i) => s + i.product.priceUSD * i.quantity, 0);
+    const subtotalINR = cart.reduce((s, i) => s + i.product.priceINR * i.quantity, 0);
+    const shippingCost =
+      region === 'IN' ? (subtotalINR >= 1999 ? 0 : 150) : subtotalUSD >= 50 ? 0 : 5;
+    const total = (region === 'IN' ? subtotalINR : subtotalUSD) + shippingCost;
+
+    trackBeginCheckout(cart, total, region === 'IN' ? 'INR' : 'USD', shippingCost);
+
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
   };
 
-  // Place order
+  // Place order + GA4 purchase
   const handlePlaceOrder = (order: ConfirmedOrder) => {
+    trackPurchase(order);
     setConfirmedOrder(order);
     setIsCheckoutOpen(false);
     setCart([]);
   };
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const openInspectorToTab = (tab: 'questions' | 'funnel' | 'channels' | 'simulator' | 'viva' | 'gtag') => {
+    setInspectorTab(tab);
+    setIsGA4DeckOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#202124] flex flex-col font-sans selection:bg-[#E8F0FE] selection:text-[#1A73E8]">
@@ -164,7 +219,7 @@ export default function App() {
         onSearchChange={setSearchQuery}
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
-        onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+        onOpenGA4Deck={() => openInspectorToTab('questions')}
         checkoutMode={checkoutMode}
         cartPulse={cartPulse}
       />
@@ -175,9 +230,9 @@ export default function App() {
         <DataDrivenHeroBanner
           products={PRODUCTS}
           region={region}
-          onSelectProduct={(p) => setSelectedProduct(p)}
+          onSelectProduct={handleSelectProduct}
           onSelectCategory={(cat) => setSelectedCategory(cat)}
-          onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+          onOpenGA4Deck={() => openInspectorToTab('questions')}
         />
 
         {/* Module A & C: Data-Backed Catalog Listing */}
@@ -188,17 +243,17 @@ export default function App() {
           onSelectCategory={setSelectedCategory}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          onSelectProduct={(p) => setSelectedProduct(p)}
+          onSelectProduct={handleSelectProduct}
           onQuickAdd={handleQuickAdd}
           justAddedId={justAddedId}
-          onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+          onOpenGA4Deck={() => openInspectorToTab('questions')}
         />
       </main>
 
       {/* Footer */}
       <Footer
         region={region}
-        onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+        onOpenGA4Deck={() => openInspectorToTab('viva')}
         onSelectCategory={setSelectedCategory}
       />
 
@@ -206,10 +261,10 @@ export default function App() {
       <ProductDetailModal
         product={selectedProduct}
         region={region}
-        onClose={() => setSelectedProduct(null)}
+        onClose={() => handleSelectProduct(null)}
         onAddToCart={handleAddToCart}
         onAddBundleItem={handleAddBundleItem}
-        onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+        onOpenGA4Deck={() => openInspectorToTab('questions')}
       />
 
       {/* Module C: Transparent Cart Drawer */}
@@ -224,7 +279,7 @@ export default function App() {
         onProceedToCheckout={handleProceedToCheckout}
         onSelectCategory={(cat) => setSelectedCategory(cat as Category)}
         onAddQuickItem={(p) => handleAddToCart(p, 1)}
-        onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+        onOpenGA4Deck={() => openInspectorToTab('funnel')}
       />
 
       {/* Module C: Streamlined Single-Page Checkout Modal */}
@@ -235,14 +290,14 @@ export default function App() {
         region={region}
         checkoutMode={checkoutMode}
         onPlaceOrder={handlePlaceOrder}
-        onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+        onOpenGA4Deck={() => openInspectorToTab('funnel')}
       />
 
       {/* Order Confirmation */}
       <OrderConfirmationModal
         order={confirmedOrder}
         onClose={() => setConfirmedOrder(null)}
-        onOpenGA4Deck={() => setIsGA4DeckOpen(true)}
+        onOpenGA4Deck={() => openInspectorToTab('gtag')}
       />
 
       {/* GA4 5-Question Foundation & Viva Inspector */}
@@ -254,7 +309,33 @@ export default function App() {
           setCheckoutMode((prev) => (prev === 'optimized' ? 'baseline' : 'optimized'))
         }
         region={region}
+        initialTab={inspectorTab}
       />
+
+      {/* Floating GA4 Real-Time Dispatch Pill (Quick Viva / Evaluation Access) */}
+      <div className="fixed bottom-4 right-4 z-40">
+        <button
+          onClick={() => openInspectorToTab('gtag')}
+          className="group flex items-center space-x-2 bg-[#202124] text-white hover:bg-[#303134] px-3.5 py-2 rounded-full shadow-lg border border-[#5F6368]/40 transition-all cursor-pointer text-xs"
+          title="Open GA4 Real-Time Event Stream"
+        >
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#34A853] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#34A853]"></span>
+          </span>
+          <Activity className="w-3.5 h-3.5 text-[#8AB4F8]" />
+          <span className="font-semibold text-[11px]">
+            {latestEvent ? (
+              <>
+                <span className="text-[#BDC1C6]">GA4:</span>{' '}
+                <span className="font-mono text-[#81C995] font-bold">{latestEvent.eventName}</span>
+              </>
+            ) : (
+              'GA4 gtag.js Active'
+            )}
+          </span>
+        </button>
+      </div>
     </div>
   );
 }

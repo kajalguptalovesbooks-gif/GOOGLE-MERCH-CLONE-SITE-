@@ -237,87 +237,146 @@ export const DataDrivenHeroBanner: React.FC<DataDrivenHeroBannerProps> = ({
         </div>
       </div>
 
-      {/* MODULE A: Z-PATTERN PRIMARY VIEWPORT ENTRY POINTS */}
+      {/* MODULE A: Z-PATTERN PRIMARY VIEWPORT ENTRY POINTS & BRAND COLLECTIONS */}
       <div className="bg-[#F8F9FA] border-t border-[#E8EAED] py-6 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#1A73E8] bg-[#E8F0FE] px-2.5 py-0.5 rounded-full">
-                Module A • Z-Pattern Viewport Entry
+                Brand & Collection Navigation
               </span>
               <h2 className="text-sm sm:text-base font-bold text-[#202124] mt-1">
-                High-Converting Organic Search Entry Categories
+                Explore Official Google Collections & Merchandising
               </h2>
             </div>
             <span className="text-xs text-[#5F6368] hidden md:inline">
-              Placed at top viewport per Q1 & Q5 architectural specifications
+              Positioned at top viewport per PRD Section 3 specifications
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Category Card 1: Apparel (Desktop & Organic Search Anchor) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
+            {/* 1. 1998 Retro Collection */}
             <div
-              onClick={() => onSelectCategory('Apparel')}
-              className="group bg-white p-5 rounded-2xl border border-[#DADCE0] hover:border-[#1A73E8] hover:shadow-md transition-all cursor-pointer flex items-center justify-between"
+              onClick={() => onSelectCategory('1998 Retro Collection')}
+              className="group bg-white p-4 rounded-2xl border border-[#DADCE0] hover:border-[#1A73E8] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
             >
-              <div className="space-y-1.5 pr-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-md">
-                    Top Performer
-                  </span>
-                  <span className="text-[11px] text-[#5F6368]">40%+ Organic Rev</span>
-                </div>
-                <h3 className="text-base font-bold text-[#202124] group-hover:text-[#1A73E8] transition-colors">
-                  Apparel & Outerwear Collection
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-md inline-block">
+                  Organic Anchor
+                </span>
+                <h3 className="text-xs sm:text-sm font-bold text-[#202124] group-hover:text-[#1A73E8] transition-colors line-clamp-1">
+                  1998 Retro Collection
                 </h3>
-                <p className="text-xs text-[#5F6368] leading-relaxed line-clamp-2">
-                  Featuring the Marine Layer 1998 Pullover, Super G Gradient Tee, and organic French terry hoodies.
+                <p className="text-[11px] text-[#5F6368] line-clamp-2">
+                  Featuring Marine Layer 1998 Pullover, vintage mugs, and baseball tees.
                 </p>
-                <div className="pt-1 text-xs font-bold text-[#1A73E8] flex items-center gap-1">
-                  <span>Explore Apparel Grid</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
               </div>
-
-              <div className="w-24 h-24 bg-[#F8F9FA] rounded-xl p-2 shrink-0 border border-[#E8EAED] flex items-center justify-center">
-                <img
-                  src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=400&q=80"
-                  alt="Apparel"
-                  className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
-                />
+              <div className="pt-3 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#1A73E8] flex items-center gap-1">
+                  Shop 1998
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[10px] text-[#70757A] font-semibold">4 items</span>
               </div>
             </div>
 
-            {/* Category Card 2: Android Collectibles (High-Intent Audience) */}
+            {/* 2. Android Collectibles & Plushies */}
             <div
-              onClick={() => onSelectCategory('Android Collectibles')}
-              className="group bg-white p-5 rounded-2xl border border-[#DADCE0] hover:border-[#34A853] hover:shadow-md transition-all cursor-pointer flex items-center justify-between"
+              onClick={() => onSelectCategory('Android Collectibles & Plushies')}
+              className="group bg-white p-4 rounded-2xl border border-[#DADCE0] hover:border-[#34A853] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
             >
-              <div className="space-y-1.5 pr-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs font-bold text-[#137333] bg-[#E6F4EA] px-2 py-0.5 rounded-md">
-                    Q1 High-Intent Focus
-                  </span>
-                  <span className="text-[11px] text-[#5F6368]">2.8x Repeat Velocity</span>
-                </div>
-                <h3 className="text-base font-bold text-[#202124] group-hover:text-[#137333] transition-colors">
-                  Android Collectibles & Mascot Gear
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#137333] bg-[#E6F4EA] px-2 py-0.5 rounded-md inline-block">
+                  Trending Showcase
+                </span>
+                <h3 className="text-xs sm:text-sm font-bold text-[#202124] group-hover:text-[#137333] transition-colors line-clamp-1">
+                  Android Collectibles
                 </h3>
-                <p className="text-xs text-[#5F6368] leading-relaxed line-clamp-2">
-                  Featuring the viral Android Classic Plushie, collector figurines, and enamel lapel pins.
+                <p className="text-[11px] text-[#5F6368] line-clamp-2">
+                  Viral Bugdroid Plushie, mini bot vinyls, and $9 lapel pin boosters.
                 </p>
-                <div className="pt-1 text-xs font-bold text-[#137333] flex items-center gap-1">
-                  <span>Explore Android Collectibles</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
               </div>
+              <div className="pt-3 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#137333] flex items-center gap-1">
+                  Shop Android
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[10px] text-[#70757A] font-semibold">4 items</span>
+              </div>
+            </div>
 
-              <div className="w-24 h-24 bg-[#F8F9FA] rounded-xl p-2 shrink-0 border border-[#E8EAED] flex items-center justify-center">
-                <img
-                  src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?auto=format&fit=crop&w=400&q=80"
-                  alt="Android Collectibles"
-                  className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform"
-                />
+            {/* 3. YouTube Kids & Apparel */}
+            <div
+              onClick={() => onSelectCategory('YouTube Kids & Apparel')}
+              className="group bg-white p-4 rounded-2xl border border-[#DADCE0] hover:border-[#EA4335] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
+            >
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#EA4335] bg-[#FCE8E6] px-2 py-0.5 rounded-md inline-block">
+                  Creator Gear
+                </span>
+                <h3 className="text-xs sm:text-sm font-bold text-[#202124] group-hover:text-[#EA4335] transition-colors line-clamp-1">
+                  YouTube Kids & Apparel
+                </h3>
+                <p className="text-[11px] text-[#5F6368] line-clamp-2">
+                  Iconic red hoodies, creator pins, tumbler, and playful doodle tees.
+                </p>
+              </div>
+              <div className="pt-3 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#EA4335] flex items-center gap-1">
+                  Shop YouTube
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[10px] text-[#70757A] font-semibold">4 items</span>
+              </div>
+            </div>
+
+            {/* 4. Chrome Dino Collectibles */}
+            <div
+              onClick={() => onSelectCategory('Chrome Dino Collectibles')}
+              className="group bg-white p-4 rounded-2xl border border-[#DADCE0] hover:border-[#FBBC04] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
+            >
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#B06000] bg-[#FEF7E0] px-2 py-0.5 rounded-md inline-block">
+                  Developer Icon
+                </span>
+                <h3 className="text-xs sm:text-sm font-bold text-[#202124] group-hover:text-[#B06000] transition-colors line-clamp-1">
+                  Chrome Dino Collectibles
+                </h3>
+                <p className="text-[11px] text-[#5F6368] line-clamp-2">
+                  "No Internet" 8-bit runner desk figurine, pixel tee, and strapback cap.
+                </p>
+              </div>
+              <div className="pt-3 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#B06000] flex items-center gap-1">
+                  Shop Dino
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[10px] text-[#70757A] font-semibold">4 items</span>
+              </div>
+            </div>
+
+            {/* 5. Classic Google Drinkware & Accessories */}
+            <div
+              onClick={() => onSelectCategory('Classic Google Drinkware, Accessories & Stationery')}
+              className="group bg-white p-4 rounded-2xl border border-[#DADCE0] hover:border-[#4285F4] hover:shadow-md transition-all cursor-pointer flex flex-col justify-between"
+            >
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-[#1A73E8] bg-[#E8F0FE] px-2 py-0.5 rounded-md inline-block">
+                  Campus & Office
+                </span>
+                <h3 className="text-xs sm:text-sm font-bold text-[#202124] group-hover:text-[#1A73E8] transition-colors line-clamp-1">
+                  Classic Drinkware & Gear
+                </h3>
+                <p className="text-[11px] text-[#5F6368] line-clamp-2">
+                  Recycled backpack, Super G tee, Eco insulated bottle, and bamboo journal.
+                </p>
+              </div>
+              <div className="pt-3 flex items-center justify-between">
+                <span className="text-[11px] font-bold text-[#1A73E8] flex items-center gap-1">
+                  Shop Classic
+                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <span className="text-[10px] text-[#70757A] font-semibold">7 items</span>
               </div>
             </div>
           </div>
